@@ -11,9 +11,9 @@ public class Avvio extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent arg1)
     {
-        Intent startupBootIntent = new Intent(context, MainActivity.class);
-        startupBootIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(startupBootIntent);
 
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 }
