@@ -34,8 +34,6 @@ public class Servizio extends Service
     String __speakServiceMessage;
     Intent recognizerIntent;
     SpeechRecognizer speechRecognizer;
-    String __language = "it-IT";
-    Parla __parla = new Parla();
 
     @Override
     public void onCreate() {
@@ -115,7 +113,7 @@ public class Servizio extends Service
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getApplicationInfo().name);
 
-        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(getBaseContext());
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());
         speechRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
             public void onReadyForSpeech(Bundle params) {
@@ -255,13 +253,12 @@ public class Servizio extends Service
         */
 
         if (activationKey) {
-            __speakServiceMessage = frase;
-            __parla.Parla(getApplicationContext(), __speakServiceMessage);
             //Log.i(__logTag, __speakServiceMessage);
         }
 
-        __speakServiceMessage = frase;
-        __parla.Parla(getApplicationContext(), __speakServiceMessage);
+        TryAnswer tryAnswer = new TryAnswer(getApplicationContext());
+        tryAnswer.Send(frase);
+
     }
 
 }
