@@ -245,17 +245,24 @@ public class Servizio extends Service
         boolean wakeupWord = false;
 
         String[] parole = frase.split(" ");
+        String intento = "";
 
         for(int i = 0; i < parole.length; i++)
         {
-            if(parole[i].equalsIgnoreCase(WAKEUP_WORD))wakeupWord = true;
+            String parola = parole[i];
+            if(parola.equalsIgnoreCase(WAKEUP_WORD)) {
+                wakeupWord = true;
+            }
+            else{
+                intento += parola + " ";
+            }
         }
 
         if (wakeupWord) {
-            Log.i("wakeupWord", "found");
+            Log.i("wakeupWord", "found:" + intento);
 
             TryAnswer tryAnswer = new TryAnswer(getApplicationContext());
-            tryAnswer.Send(frase);
+            tryAnswer.Send(intento);
         }
 
     }

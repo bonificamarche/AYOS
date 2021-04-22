@@ -1,5 +1,6 @@
 package it.havok.ayos;
 
+import android.app.Activity;
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -20,19 +21,19 @@ public class Parla {
                         int result = __tts.setLanguage(Locale.ITALY);
 
                         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                            toastMessage = "Language not supported";
+                            toastMessage = "Lingua non supportata";
                         } else {
-                            toastMessage = "TTS works!";
+                            toastMessage = "TTS pronto!";
                             __tts.speak(messaggio, TextToSpeech.QUEUE_FLUSH, null);
                         }
                         break;
 
                     case TextToSpeech.ERROR:
-                        toastMessage = "Initialization failed";
+                        toastMessage = "Initializazione fallita";
                         break;
 
                     default:
-                        toastMessage = "Unknow error";
+                        toastMessage = "Errore sconosciuto";
                         break;
                 }
                 Log.i("TTS", toastMessage);

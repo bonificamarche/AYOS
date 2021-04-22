@@ -36,28 +36,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button buttonRekognition = findViewById(R.id.buttonRecognition);
-        Button buttonSinthesys = findViewById(R.id.buttonSinthesys);
         Log.i(TAG, "onCreate");
 
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-
-        buttonRekognition.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-            }
-        });
-
-        buttonSinthesys.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String messaggio = "hai premuto il pulsante di test";
-                parla.Parla(getApplicationContext(), messaggio);
-            }
-        });
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {

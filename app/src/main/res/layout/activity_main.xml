@@ -30,25 +30,33 @@
         android:layout_height="wrap_content"
         android:progress="50" />
 
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="120dp"
-        android:textSize="25sp"
-        android:id="@+id/textViewFrase" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="toRekognition"
-        android:id="@+id/buttonRecognition" />
+        android:text="Query"
+        android:textSize="16sp" />
 
-    <Button
+    <EditText
+        android:id="@+id/editTextQuery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"/>
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="toSpeak"
-        android:id="@+id/buttonSinthesys" />
+        android:text="Answer"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/editTextAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"/>
 
 </LinearLayout>
