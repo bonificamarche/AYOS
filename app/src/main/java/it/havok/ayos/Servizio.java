@@ -32,6 +32,7 @@ public class Servizio extends Service
     String __logTag = "ascolto";
     String __message;
     String __speakServiceMessage;
+    String WAKEUP_WORD = "alessia";
     Intent recognizerIntent;
     SpeechRecognizer speechRecognizer;
 
@@ -241,23 +242,21 @@ public class Servizio extends Service
 
     public void ControlloAscolto(String frase)
     {
-        boolean activationKey = false;
+        boolean wakeupWord = false;
 
         String[] parole = frase.split(" ");
 
-        /*
         for(int i = 0; i < parole.length; i++)
         {
-            if(parole[i].equalsIgnoreCase(ACTIVATION_WORD))activationKey = true;
-        }
-        */
-
-        if (activationKey) {
-            //Log.i(__logTag, __speakServiceMessage);
+            if(parole[i].equalsIgnoreCase(WAKEUP_WORD))wakeupWord = true;
         }
 
-        TryAnswer tryAnswer = new TryAnswer(getApplicationContext());
-        tryAnswer.Send(frase);
+        if (wakeupWord) {
+            Log.i("wakeupWord", "found");
+
+            TryAnswer tryAnswer = new TryAnswer(getApplicationContext());
+            tryAnswer.Send(frase);
+        }
 
     }
 
