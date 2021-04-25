@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -29,7 +30,7 @@ public class Servizio extends Service
     int counter = 0;
     Timer timer;
     TimerTask timerTask;
-    String __logTag = "ascolto";
+    String TAG = "ascolto";
     String __message;
     String __speakServiceMessage;
     String WAKEUP_WORD = "alessia";
@@ -41,8 +42,8 @@ public class Servizio extends Service
         super.onCreate();
 
         __message = "onCreate";
-        Log.i(__logTag, __message);
-        Toast.makeText(getApplicationContext(), __logTag + " " + __message, Toast.LENGTH_LONG).show();
+        Log.i(TAG, __message);
+        Toast.makeText(getApplicationContext(), TAG + " " + __message, Toast.LENGTH_LONG).show();
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
             startMyOwnForeground();
@@ -59,7 +60,7 @@ public class Servizio extends Service
     private void startMyOwnForeground()
     {
         __message = "startMyOwnForeground";
-        Log.i(__logTag, __message);
+        Log.i(TAG, __message);
         String NOTIFICATION_CHANNEL_ID = "example.permanence";
         String channelName = "Background Service";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
@@ -108,11 +109,14 @@ public class Servizio extends Service
     public void IstanziaRecognizer()
     {
         __speakServiceMessage = "IstanziaRecognizer";
-        Log.i(__logTag, __speakServiceMessage);
+        Log.i(TAG, __speakServiceMessage);
 
         recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getApplicationInfo().name);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getApplication().getPackageName());
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.ITALY.toString());
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, Locale.ITALY.toString());
 
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());
         speechRecognizer.setRecognitionListener(new RecognitionListener() {
@@ -120,14 +124,14 @@ public class Servizio extends Service
             public void onReadyForSpeech(Bundle params) {
                 __speakServiceMessage = "in ascolto: " + params.toString();
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
-                Log.i(__logTag, __speakServiceMessage);
+                Log.i(TAG, __speakServiceMessage);
             }
 
             @Override
             public void onBeginningOfSpeech() {
                 __speakServiceMessage = "inizio ascolto";
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
-                Log.i(__logTag, __speakServiceMessage);
+                Log.i(TAG, __speakServiceMessage);
             }
 
             @Override
@@ -149,7 +153,7 @@ public class Servizio extends Service
             public void onEndOfSpeech() {
                 __speakServiceMessage = "ascolto terminato";
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
-                Log.i(__logTag, __speakServiceMessage);
+                Log.i(TAG, __speakServiceMessage);
             }
 
             @Override
@@ -169,7 +173,7 @@ public class Servizio extends Service
 
                 __speakServiceMessage = "errore " + message;
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
-                Log.i(__logTag, __speakServiceMessage);
+                Log.i(TAG, __speakServiceMessage);
 
 
                 AvviaAscolto();
@@ -179,7 +183,9 @@ public class Servizio extends Service
             public void onResults(Bundle results) {
 
                 String frase = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).get(0);
-                ControlloAscolto(frase);
+                if(!frase.isEmpty() || frase != null){
+                    ControlloAscolto(frase);
+                }
                 __speakServiceMessage = "onResults: " + frase;
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
                 //Log.i(__logTag, __speakServiceMessage);
@@ -191,7 +197,7 @@ public class Servizio extends Service
 
                 __speakServiceMessage = "dialogo parziale: " + partialResults.toString();
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
-                Log.i(__logTag, __speakServiceMessage);
+                Log.i(TAG, __speakServiceMessage);
             }
 
             @Override
@@ -199,14 +205,14 @@ public class Servizio extends Service
 
                 __speakServiceMessage = "evento: " + eventType + " - " + params.toString();
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
-                Log.i(__logTag, __speakServiceMessage);
+                Log.i(TAG, __speakServiceMessage);
             }
         });
     }
 
     public void AvviaAscolto() {
         __message = "AvviaAscolto";
-        Log.i(__logTag, __message);
+        Log.i(TAG, __message);
         speechRecognizer.startListening(recognizerIntent);
     }
 
@@ -216,7 +222,7 @@ public class Servizio extends Service
         super.onStartCommand(intent, flag, startId);;
 
         __message = "onStartCommand";
-        Log.i(__logTag, __message);
+        Log.i(TAG, __message);
 
         startTimer();
         IstanziaRecognizer();
@@ -245,7 +251,6 @@ public class Servizio extends Service
         boolean wakeupWord = false;
 
         String[] parole = frase.split(" ");
-        String intento = "";
 
         for(int i = 0; i < parole.length; i++)
         {
@@ -253,16 +258,34 @@ public class Servizio extends Service
             if(parola.equalsIgnoreCase(WAKEUP_WORD)) {
                 wakeupWord = true;
             }
-            else{
-                intento += parola + " ";
-            }
         }
 
+        TryAnswer tryAnswer = new TryAnswer(getApplicationContext());
+        Log.i(TAG, frase);
         if (wakeupWord) {
-            Log.i("wakeupWord", "found:" + intento);
+            Log.i(TAG, "wakeupWordFound");
+            tryAnswer.Send(frase);
+        }else{
 
-            TryAnswer tryAnswer = new TryAnswer(getApplicationContext());
-            tryAnswer.Send(intento);
+            String NOTIFICATION_CHANNEL_ID = "ayos.freeRecognition";
+            /*
+            String channelName = "Free Recognition";
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+            notificationChannel.setLightColor(Color.BLUE);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            */
+
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+            Notification notification = notificationBuilder
+                    .setOngoing(true)
+                    .setContentTitle("Free Intent Detected")
+                    .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
+                    .setCategory(Notification.CATEGORY_STATUS)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .build();
+
+            Log.i(TAG, "wakeupWordNotFound");
+            tryAnswer.RAW(frase);
         }
 
     }

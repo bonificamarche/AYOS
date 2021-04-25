@@ -1,8 +1,14 @@
 package it.havok.ayos;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.widget.EditText;
+
+import androidx.core.app.NotificationCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,29 +25,34 @@ import java.util.Map;
 
 public class TryAnswer {
 
-    Context __context;
+    Context CONTEXT;
     String TAG = "TryAnswer";
     String TAG_MSG = "";
 
+    String __message;
+    String __logTag = "tryAnswer";
+
+    String URL = "https://webserv.havok.it/ayos/";
+    String WS_RECORDS = "records.php";
+    String WS_AAA = "aaa.php";
+    String PARAMS_KK = "8d5e957f297893487bd98fa830fa6413";
+    String PARAMS_KS = "8d5e957f297893487bd98fa830fa6413";
+    //String PARAMS_U = "24943";
+    String PARAMS_U = "304";
+
     public TryAnswer(Context context) {
-        __context = context;
+        CONTEXT = context;
 
     }
 
     public void Send(String frase) {
 
-        String __message;
-        String __logTag = "tryAnswer";
+        //EditText editTextQuery = (EditText)findViewById(R.id.editTextQuery);
 
-        String url = "https://webserv.havok.it/ayos/records.php";
-        String kk = "8d5e957f297893487bd98fa830fa6413";
-        String ks = "8d5e957f297893487bd98fa830fa6413";
-        String u = "24943";
-
-        RequestQueue queue = Volley.newRequestQueue(__context);
+        RequestQueue queue = Volley.newRequestQueue(CONTEXT);
         StringRequest jsonObjectRequest = new StringRequest(
                 Request.Method.POST,
-                url,
+                URL + WS_RECORDS,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -52,7 +63,7 @@ public class TryAnswer {
                             Log.i(TAG, esito);
 
                             Parla parla = new Parla();
-                            parla.Parla(__context, esito);
+                            parla.Parla(CONTEXT, esito);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -72,9 +83,50 @@ public class TryAnswer {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("f", frase);
-                params.put("kk", kk);
-                params.put("ks", ks);
-                params.put("u", u);
+                params.put("kk", PARAMS_KK);
+                params.put("ks", PARAMS_KS);
+                params.put("u", PARAMS_U);
+
+                return params;
+            }
+        };
+        queue.add(jsonObjectRequest);
+    }
+    public void RAW(String frase) {
+
+        RequestQueue queue = Volley.newRequestQueue(CONTEXT);
+        StringRequest jsonObjectRequest = new StringRequest(
+                Request.Method.POST,
+                URL + WS_AAA,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+
+                            JSONObject jsonObject = new JSONObject(response);
+                            String esito = jsonObject.getString("esito");
+                            Log.i(TAG, esito);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.d("Error.Response", error.toString());
+                    }
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("f", frase);
+                params.put("kk", PARAMS_KK);
+                params.put("ks", PARAMS_KS);
 
                 return params;
             }
