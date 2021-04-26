@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -65,7 +66,7 @@ public class Servizio extends Service
         String channelName = "Background Service";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
-        chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         assert manager != null;
@@ -129,7 +130,7 @@ public class Servizio extends Service
 
             @Override
             public void onBeginningOfSpeech() {
-                __speakServiceMessage = "inizio ascolto";
+                __speakServiceMessage = "inizio parlato";
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
                 Log.i(TAG, __speakServiceMessage);
             }
@@ -151,7 +152,7 @@ public class Servizio extends Service
 
             @Override
             public void onEndOfSpeech() {
-                __speakServiceMessage = "ascolto terminato";
+                __speakServiceMessage = "fine parlato";
                 //__parla.Parla(getApplicationContext(), __speakServiceMessage);
                 Log.i(TAG, __speakServiceMessage);
             }
@@ -211,9 +212,15 @@ public class Servizio extends Service
     }
 
     public void AvviaAscolto() {
-        __message = "AvviaAscolto";
-        Log.i(TAG, __message);
-        speechRecognizer.startListening(recognizerIntent);
+        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        if(telephonyManager.getCallState() != TelephonyManager.CALL_STATE_OFFHOOK) {
+            __message = "Microfono Disponibile";
+            speechRecognizer.startListening(recognizerIntent);
+        }else{
+            __message = "Microfono Impegnato";
+            AvviaAscolto();
+        }
+        Log.i(TAG, __message + " " + telephonyManager.getCallState());
     }
 
     @Override
@@ -227,7 +234,6 @@ public class Servizio extends Service
         startTimer();
         IstanziaRecognizer();
         AvviaAscolto();
-
         return START_STICKY;
 
     }
@@ -266,24 +272,6 @@ public class Servizio extends Service
             Log.i(TAG, "wakeupWordFound");
             tryAnswer.Send(frase);
         }else{
-
-            String NOTIFICATION_CHANNEL_ID = "ayos.freeRecognition";
-            /*
-            String channelName = "Free Recognition";
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
-            notificationChannel.setLightColor(Color.BLUE);
-            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            */
-
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
-            Notification notification = notificationBuilder
-                    .setOngoing(true)
-                    .setContentTitle("Free Intent Detected")
-                    .setPriority(NotificationManager.IMPORTANCE_DEFAULT)
-                    .setCategory(Notification.CATEGORY_STATUS)
-                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                    .build();
-
             Log.i(TAG, "wakeupWordNotFound");
             tryAnswer.RAW(frase);
         }

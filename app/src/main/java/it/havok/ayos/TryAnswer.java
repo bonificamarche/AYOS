@@ -37,8 +37,8 @@ public class TryAnswer {
     String WS_AAA = "aaa.php";
     String PARAMS_KK = "8d5e957f297893487bd98fa830fa6413";
     String PARAMS_KS = "8d5e957f297893487bd98fa830fa6413";
-    //String PARAMS_U = "24943";
-    String PARAMS_U = "304";
+    String PARAMS_U = "24943";
+    //String PARAMS_U = "304";
 
     public TryAnswer(Context context) {
         CONTEXT = context;
