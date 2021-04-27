@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -41,6 +42,7 @@ public class Servizio extends Service
     @Override
     public void onCreate() {
         super.onCreate();
+
 
         __message = "onCreate";
         Log.i(TAG, __message);
@@ -213,14 +215,17 @@ public class Servizio extends Service
 
     public void AvviaAscolto() {
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        if(telephonyManager.getCallState() != TelephonyManager.CALL_STATE_OFFHOOK) {
-            __message = "Microfono Disponibile";
-            speechRecognizer.startListening(recognizerIntent);
-        }else{
+        AudioManager manager = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+
+        if(manager.getMode() == AudioManager.MODE_IN_COMMUNICATION){
+        //if(telephonyManager.getCallState() != TelephonyManager.CALL_STATE_OFFHOOK) {
             __message = "Microfono Impegnato";
             AvviaAscolto();
+        }else{
+            __message = "Microfono Disponibile";
+            speechRecognizer.startListening(recognizerIntent);
         }
-        Log.i(TAG, __message + " " + telephonyManager.getCallState());
+        Log.i(TAG, __message + " " + manager.getMode());
     }
 
     @Override
