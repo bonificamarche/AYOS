@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,6 +31,7 @@ import java.util.TimerTask;
 public class Servizio extends Service
 {
     int counter = 0;
+    SecondsFromLastAnswer secondsFromLastAnswer = new SecondsFromLastAnswer();
     Timer timer;
     TimerTask timerTask;
     String TAG = "ascolto";
@@ -94,7 +96,15 @@ public class Servizio extends Service
         timer = new Timer();
         timerTask = new TimerTask() {
             public void run() {
-                Log.i("Count", "=========  "+ (counter++));
+                Log.i("Count", "=========  " + (counter++));
+                /*
+                if(secondsFromLastAnswer.secondsPassed > secondsFromLastAnswer.secondsFromLastAnswer){
+                    secondsFromLastAnswer.secondsPassed = 0;
+                }else {
+                    secondsFromLastAnswer.secondsPassed++;
+                }
+                */
+
             }
         };
         timer.schedule(timerTask, 1000, 1000); //
@@ -217,7 +227,7 @@ public class Servizio extends Service
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         AudioManager manager = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
-        if(manager.getMode() == AudioManager.MODE_IN_COMMUNICATION){
+        if(manager.getMode() == AudioManager.MODE_IN_COMMUNICATION || manager.getMode() == AudioManager.MODE_RINGTONE){
         //if(telephonyManager.getCallState() != TelephonyManager.CALL_STATE_OFFHOOK) {
             __message = "Microfono Impegnato";
             AvviaAscolto();
@@ -262,25 +272,41 @@ public class Servizio extends Service
         boolean wakeupWord = false;
 
         String[] parole = frase.split(" ");
+        String intento = frase;
 
-        for(int i = 0; i < parole.length; i++)
-        {
-            String parola = parole[i];
-            if(parola.equalsIgnoreCase(WAKEUP_WORD)) {
-                wakeupWord = true;
+        Date now = new Date();
+
+        secondsFromLastAnswer.secondsPassed = (now.getTime() - secondsFromLastAnswer.timeOfLastAnswer.getTime()) / 1000;
+        Log.i(TAG, "secondsPassed:" + secondsFromLastAnswer.secondsPassed);
+
+        if(secondsFromLastAnswer.secondsPassed <= secondsFromLastAnswer.secondsFromLastAnswer && secondsFromLastAnswer.firstIntentPassed) {
+            wakeupWord = true;
+        }else{
+            intento = "";
+            for (int i = 0; i < parole.length; i++) {
+                String parola = parole[i];
+                if (parola.equalsIgnoreCase(WAKEUP_WORD)) {
+                    wakeupWord = true;
+                } else {
+                    intento += parola + " ";
+                }
             }
+            intento = intento.trim();
         }
+        secondsFromLastAnswer.timeOfLastAnswer = new Date();
+
+        if(!secondsFromLastAnswer.firstIntentPassed)secondsFromLastAnswer.firstIntentPassed = true;
 
         TryAnswer tryAnswer = new TryAnswer(getApplicationContext());
         Log.i(TAG, frase);
+
         if (wakeupWord) {
             Log.i(TAG, "wakeupWordFound");
-            tryAnswer.Send(frase);
-        }else{
+            tryAnswer.Send(intento);
+        }else {
             Log.i(TAG, "wakeupWordNotFound");
             tryAnswer.RAW(frase);
         }
 
     }
-
 }

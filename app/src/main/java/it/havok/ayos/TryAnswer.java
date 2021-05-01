@@ -33,10 +33,11 @@ public class TryAnswer {
     String __logTag = "tryAnswer";
 
     String URL = "https://webserv.havok.it/ayos/";
-    String WS_RECORDS = "records.php";
+    String WS_RECORDS = "qa.php";
     String WS_AAA = "aaa.php";
     String PARAMS_KK = "8d5e957f297893487bd98fa830fa6413";
     String PARAMS_KS = "8d5e957f297893487bd98fa830fa6413";
+    String PARAMS_S = "17";
     String PARAMS_U = "24943";
     //String PARAMS_U = "304";
 
@@ -86,6 +87,9 @@ public class TryAnswer {
                 params.put("kk", PARAMS_KK);
                 params.put("ks", PARAMS_KS);
                 params.put("u", PARAMS_U);
+                params.put("_s", PARAMS_S);
+
+                Log.d("tryAnswer", params.toString());
 
                 return params;
             }
