@@ -257,12 +257,11 @@ public class Ascolta extends RecognitionService {
 
         String[] parole = frase.split(" ");
 
-        /*
+
         for(int i = 0; i < parole.length; i++)
         {
             if(parole[i].equalsIgnoreCase(ACTIVATION_WORD))activationKey = true;
         }
-        */
 
         if (activationKey) {
             __speakServiceMessage = frase;

@@ -227,8 +227,7 @@ public class Servizio extends Service
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         AudioManager manager = (AudioManager)getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
-        if(manager.getMode() == AudioManager.MODE_IN_COMMUNICATION || manager.getMode() == AudioManager.MODE_RINGTONE){
-        //if(telephonyManager.getCallState() != TelephonyManager.CALL_STATE_OFFHOOK) {
+        if(manager.getMode() == AudioManager.MODE_IN_COMMUNICATION || manager.getMode() == AudioManager.MODE_RINGTONE || telephonyManager.getCallState() == TelephonyManager.CALL_STATE_OFFHOOK){
             __message = "Microfono Impegnato";
             AvviaAscolto();
         }else{
@@ -281,18 +280,18 @@ public class Servizio extends Service
 
         if(secondsFromLastAnswer.secondsPassed <= secondsFromLastAnswer.secondsFromLastAnswer && secondsFromLastAnswer.firstIntentPassed) {
             wakeupWord = true;
-        }else{
-            intento = "";
-            for (int i = 0; i < parole.length; i++) {
-                String parola = parole[i];
-                if (parola.equalsIgnoreCase(WAKEUP_WORD)) {
-                    wakeupWord = true;
-                } else {
-                    intento += parola + " ";
-                }
-            }
-            intento = intento.trim();
         }
+
+        intento = "";
+        for (int i = 0; i < parole.length; i++) {
+            String parola = parole[i];
+            if (parola.equalsIgnoreCase(WAKEUP_WORD)) {
+                wakeupWord = true;
+            } else {
+                intento += parola + " ";
+            }
+        }
+        intento = intento.trim();
         secondsFromLastAnswer.timeOfLastAnswer = new Date();
 
         if(!secondsFromLastAnswer.firstIntentPassed)secondsFromLastAnswer.firstIntentPassed = true;
